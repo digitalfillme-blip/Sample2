@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fillme Networks — We Tell Stories That Stay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --red: #E8001A;
+  --red-dim: rgba(232,0,26,0.15);
+  --black: #000000;
+  --off-black: #080808;
+  --gray: #111111;
+  --gray2: #1A1A1A;
+  --white: #FFFFFF;
+  --white-60: rgba(255,255,255,0.6);
+  --white-20: rgba(255,255,255,0.2);
+  --white-08: rgba(255,255,255,0.08);
+  --white-04: rgba(255,255,255,0.04);
+  --D: 'Bebas Neue', sans-serif;
+  --S: 'Cormorant Garamond', serif;
+  --M: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--black);
+  color:var(--white);
+  font-family: var(--S);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ─── CUSTOM CURSOR ──────────────────────────────────────── */
+#cursor-dot {
+  position:fixed; width:8px; height:8px;
+  background:var(--red); border-radius:50%;
+  pointer-events:none; z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:width .15s, height .15s, background .15s;
+}
+#cursor-orbit {
+  position:fixed; width:56px; height:56px;
+  pointer-events:none; z-index:99998;
+  transform:translate(-50%,-50%);
+}
+#cursor-orbit svg {
+  width:100%; height:100%;
+  animation: orbitSpin 6s linear infinite;
+}
+@keyframes orbitSpin { to { transform:rotate(360deg); } }
+#cursor-dot.big { width:4px; height:4px; background:var(--white); }
+#cursor-orbit.big { width:80px; height:80px; }
+
+/* ─── NOISE ──────────────────────────────────────────────── */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9000;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+
+/* ─── PROGRESS ───────────────────────────────────────────── */
+#prog { position:fixed; top:0; left:0; height:2px; background:var(--red); z-index:9999; width:0; box-shadow:0 0 12px var(--red); transition:width .08s; }
+
+/* ─── NAV ────────────────────────────────────────────────── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:5000;
+  padding:28px 56px;
+  display:flex; align-items:center; justify-content:space-between;
+  transition:all .4s;
+}
+nav.stuck {
+  background:rgba(0,0,0,0.94); backdrop-filter:blur(24px);
+  padding:16px 56px;
+  border-bottom:1px solid rgba(232,0,26,0.18);
+}
+.n-logo {
+  font-family:var(--D); font-size:22px; letter-spacing:4px;
+  color:var(--white); text-decoration:none;
+}
+.n-logo b { color:var(--red); font-weight:400; }
+.n-links { display:flex; gap:40px; list-style:none; }
+.n-links a {
+  font-family:var(--M); font-size:10px; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--white-60); text-decoration:none; transition:color .3s; cursor:none;
+  position:relative;
+}
+.n-links a::after {
+  content:''; position:absolute; bottom:-3px; left:0;
+  width:0; height:1px; background:var(--red); transition:width .3s;
+}
+.n-links a:hover { color:var(--white); }
+.n-links a:hover::after { width:100%; }
+.n-cta {
+  font-family:var(--M); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--black); background:var(--red); padding:11px 26px;
+  text-decoration:none; cursor:none; transition:all .3s;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+}
+.n-cta:hover { background:var(--white); }
+.n-ham { display:none; flex-direction:column; gap:6px; cursor:none; }
+.n-ham span { width:26px; height:1.5px; background:var(--white); transition:all .3s; display:block; }
+.n-ham.open span:nth-child(1) { transform:translateY(7.5px) rotate(45deg); }
+.n-ham.open span:nth-child(2) { opacity:0; }
+.n-ham.open span:nth-child(3) { transform:translateY(-7.5px) rotate(-45deg); }
+.mob-nav {
+  position:fixed; inset:0; background:var(--black); z-index:4999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:32px;
+  opacity:0; pointer-events:none; transition:opacity .4s;
+}
+.mob-nav.open { opacity:1; pointer-events:all; }
+.mob-nav a {
+  font-family:var(--D); font-size:clamp(40px,9vw,80px); letter-spacing:3px;
+  color:var(--white); text-decoration:none; transition:color .3s; cursor:none;
+}
+.mob-nav a:hover { color:var(--red); }
+
+/* ─── HERO ───────────────────────────────────────────────── */
+#hero {
+  height:100vh; min-height:680px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  position:relative; overflow:hidden; background:var(--black);
+}
+.hero-video-wrap {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#0a0000 0%,#000 40%,#1a0005 100%);
+}
+/* Cinematic letter-box bars */
+.hero-video-wrap::before,
+.hero-video-wrap::after {
+  content:''; position:absolute; left:0; right:0; height:10vh;
+  background:var(--black); z-index:2;
+}
+.hero-video-wrap::before { top:0; }
+.hero-video-wrap::after { bottom:0; }
+/* Grid texture */
+.hero-grid-tex {
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 1px, transparent 80px);
+}
+/* Large atmospheric red glow */
+.hero-glow {
+  position:absolute; right:-10%; top:20%; width:60%; height:60%;
+  background:radial-gradient(ellipse, rgba(232,0,26,.12) 0%, transparent 70%);
+  pointer-events:none; z-index:1;
+  animation: glowPulse 5s ease-in-out infinite alternate;
+}
+@keyframes glowPulse { from{opacity:.7} to{opacity:1} }
+
+.hero-content {
+  position:relative; z-index:10;
+  padding:0 56px 10vh;
+}
+.hero-eyebrow {
+  font-family:var(--M); font-size:10px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--red); margin-bottom:20px;
+  opacity:0; animation:fadeUp .6s ease .5s forwards;
+}
+.hero-h1 {
+  font-family:var(--D); font-size:clamp(72px,10vw,160px);
+  line-height:.88; letter-spacing:2px; color:var(--white);
+  margin-bottom:0;
+}
+.hero-h1 .hl { display:block; overflow:hidden; }
+.hero-h1 .hl span {
+  display:block; transform:translateY(110%);
+  animation:lineUp .9s cubic-bezier(.77,0,.175,1) forwards;
+}
+.hero-h1 .hl:nth-child(1) span{animation-delay:.4s}
+.hero-h1 .hl:nth-child(2) span{animation-delay:.55s}
+.hero-h1 .hl:nth-child(3) span{animation-delay:.7s; color:var(--red); font-family:var(--S); font-style:italic; font-weight:300; font-size:.65em;}
+.hero-h1 .hl:nth-child(4) span{animation-delay:.85s}
+
+.hero-row {
+  display:flex; align-items:flex-end; justify-content:space-between;
+  margin-top:40px;
+  opacity:0; animation:fadeUp .7s ease 1.2s forwards;
+}
+.hero-sub {
+  font-family:var(--S); font-style:italic; font-size:clamp(16px,1.4vw,20px);
+  color:var(--white-60); line-height:1.7; max-width:480px;
+}
+.hero-btns { display:flex; gap:20px; align-items:center; flex-shrink:0; }
+.btn-red {
+  font-family:var(--M); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--white); border:1px solid var(--red); padding:15px 34px;
+  text-decoration:none; cursor:none; position:relative; overflow:hidden;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:color .4s;
+}
+.btn-red::before {
+  content:''; position:absolute; inset:0; background:var(--red);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .4s cubic-bezier(.77,0,.175,1); z-index:-1;
+}
+.btn-red:hover::before { transform:scaleX(1); }
+.btn-ghost {
+  font-family:var(--M); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--white-60); text-decoration:none; cursor:none;
+  display:flex; align-items:center; gap:10px; transition:color .3s;
+}
+.btn-ghost:hover { color:var(--white); }
+.btn-ghost span { transition:transform .3s; }
+.btn-ghost:hover span { transform:translateX(6px); }
+
+/* scroll indicator */
+.hero-scroll-ind {
+  position:absolute; bottom:12vh; right:56px; z-index:10;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  opacity:0; animation:fadeUp .6s ease 1.6s forwards;
+}
+.scroll-bar {
+  width:1px; height:60px; background:var(--white-20); overflow:hidden; position:relative;
+}
+.scroll-bar::after {
+  content:''; position:absolute; top:-100%; left:0; width:100%; height:50%;
+  background:var(--red);
+  animation:scrollDrop 2s ease-in-out infinite 2s;
+}
+@keyframes scrollDrop { 0%{top:-100%} 100%{top:200%} }
+.scroll-label {
+  font-family:var(--M); font-size:8px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--white-20);
+  writing-mode:vertical-rl;
+}
+
+@keyframes lineUp { to{transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── INLINE-IMAGE TICKER (SCHBANG SIGNATURE MOVE) ────────── */
+.img-ticker {
+  background:var(--red); overflow:hidden; padding:0;
+  border-top:0; position:relative; z-index:10;
+}
+.img-ticker-track {
+  display:flex; align-items:center;
+  width:max-content;
+  animation:tickerRoll 30s linear infinite;
+}
+.img-ticker-track:hover { animation-play-state:paused; }
+@keyframes tickerRoll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.it-item {
+  display:flex; align-items:center; gap:0; white-space:nowrap;
+  font-family:var(--D); font-size:14px; letter-spacing:5px;
+  color:var(--black); padding:0 40px; height:72px; line-height:72px;
+  cursor:none;
+}
+.it-item .it-thumb {
+  width:52px; height:52px; margin-left:32px; margin-right:0;
+  background:var(--black); overflow:hidden; flex-shrink:0;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.it-item .it-thumb div {
+  width:100%; height:100%;
+  background:linear-gradient(135deg,#1a0005,#3a0010);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--D); font-size:18px; color:rgba(255,255,255,.4);
+}
+.it-sep { color:rgba(0,0,0,.25); margin:0 20px; }
+
+/* ─── SERVICES TICKER (white bg) ─────────────────────────── */
+.svc-ticker {
+  background:var(--white); overflow:hidden; padding:14px 0;
+}
+.svc-ticker-track {
+  display:flex; width:max-content;
+  animation:tickerRoll2 20s linear infinite;
+}
+@keyframes tickerRoll2 { from{transform:translateX(-50%)} to{transform:translateX(0)} }
+.svc-item {
+  font-family:var(--M); font-size:11px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--black); padding:0 40px;
+  display:flex; align-items:center; gap:40px;
+}
+.svc-item::after { content:'✦'; color:rgba(0,0,0,.2); }
+
+/* ─── WHAT WE DO ─────────────────────────────────────────── */
+#what {
+  padding:120px 56px;
+  background:var(--off-black);
+  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
+}
+.what-left .wl-label {
+  font-family:var(--M); font-size:10px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--red); margin-bottom:20px;
+  display:flex; align-items:center; gap:12px;
+}
+.what-left .wl-label::before { content:''; width:28px; height:1px; background:var(--red); }
+.what-h {
+  font-family:var(--D); font-size:clamp(48px,5vw,80px);
+  line-height:.92; letter-spacing:1px; color:var(--white); margin-bottom:32px;
+}
+.what-h em {
+  font-family:var(--S); font-style:italic; font-weight:300;
+  color:var(--red); display:block; font-size:.68em; line-height:1.1;
+}
+.what-body {
+  font-family:var(--S); font-size:clamp(16px,1.5vw,19px);
+  color:var(--white-60); line-height:1.85; margin-bottom:40px;
+}
+.what-body strong { color:var(--white); font-weight:600; }
+.what-link {
+  font-family:var(--M); font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--white); text-decoration:none; cursor:none;
+  display:inline-flex; align-items:center; gap:14px;
+  border-bottom:1px solid var(--red); padding-bottom:6px; transition:gap .3s;
+}
+.what-link:hover { gap:24px; }
+
+/* Stats stacked */
+.what-right {
+  display:grid; grid-template-columns:1fr 1fr; gap:2px;
+}
+.stat-box {
+  background:var(--gray); padding:48px 36px;
+  position:relative; overflow:hidden; cursor:none;
+  border-top:2px solid transparent; transition:border-color .3s, background .3s;
+}
+.stat-box::before {
+  content:''; position:absolute; inset:0;
+  background:var(--red-dim); opacity:0; transition:opacity .4s;
+}
+.stat-box:hover { border-color:var(--red); background:#131313; }
+.stat-box:hover::before { opacity:1; }
+.stat-num {
+  font-family:var(--D); font-size:clamp(52px,4.5vw,72px);
+  color:var(--white); line-height:1; display:block;
+}
+.stat-suffix { color:var(--red); }
+.stat-label {
+  font-family:var(--M); font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--white-60); margin-top:10px; display:block;
+}
+
+/* ─── CASE STUDIES (NUMBERED SLIDER) ─────────────────────── */
+#work {
+  background:var(--black);
+  position:relative; overflow:hidden;
+}
+.work-header {
+  padding:80px 56px 40px;
+  display:flex; justify-content:space-between; align-items:flex-end;
+}
+.work-nav {
+  display:flex; gap:12px; align-items:center;
+}
+.work-arr {
+  width:48px; height:48px; background:var(--gray2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:none; border:1px solid var(--white-08); transition:all .3s;
+  font-size:18px; color:var(--white-60);
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.work-arr:hover { background:var(--red); border-color:var(--red); color:var(--white); }
+.work-counter {
+  font-family:var(--D); font-size:22px; color:var(--white-20); letter-spacing:2px;
+  min-width:90px; text-align:center;
+}
+.work-counter b { color:var(--white); }
+
+/* Slider */
+.cs-slider {
+  position:relative; height:70vh; min-height:500px; overflow:hidden;
+}
+.cs-slide {
+  position:absolute; inset:0;
+  display:grid; grid-template-columns:1fr 1fr;
+  opacity:0; pointer-events:none;
+  transition:opacity .6s ease;
+}
+.cs-slide.active { opacity:1; pointer-events:all; }
+.cs-img {
+  position:relative; overflow:hidden;
+}
+.cs-img-bg {
+  position:absolute; inset:0;
+  transition:transform .8s cubic-bezier(.16,1,.3,1);
+}
+.cs-slide.active .cs-img-bg { transform:scale(1); }
+.cs-slide:not(.active) .cs-img-bg { transform:scale(1.05); }
+.cs-bg1 { background:linear-gradient(135deg,#0d0000,#1a0005,#0d0000); }
+.cs-bg2 { background:linear-gradient(135deg,#000508,#001a10,#000508); }
+.cs-bg3 { background:linear-gradient(135deg,#050010,#0a001a,#050010); }
+.cs-bg4 { background:linear-gradient(135deg,#080800,#1a1500,#080800); }
+.cs-bg5 { background:linear-gradient(135deg,#00080d,#001020,#00080d); }
+.cs-bg6 { background:linear-gradient(135deg,#0a0500,#180a00,#0a0500); }
+.cs-img-over {
+  position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(0,0,0,.5) 0%, transparent 50%);
+}
+.cs-num-big {
+  position:absolute; bottom:-40px; right:-20px;
+  font-family:var(--D); font-size:25vw; color:rgba(255,255,255,.03);
+  line-height:1; pointer-events:none; user-select:none;
+}
+.cs-info {
+  background:var(--gray); padding:60px 56px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  position:relative; overflow:hidden;
+}
+.cs-info::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:var(--red);
+}
+.cs-cat {
+  font-family:var(--M); font-size:9px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--red); margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.cs-cat::before { content:''; width:24px; height:1px; background:var(--red); }
+.cs-title {
+  font-family:var(--D); font-size:clamp(32px,3.5vw,52px); letter-spacing:1px;
+  color:var(--white); line-height:1.05; margin-bottom:20px;
+}
+.cs-desc {
+  font-family:var(--S); font-style:italic; font-size:clamp(15px,1.4vw,18px);
+  color:var(--white-60); line-height:1.75; margin-bottom:40px;
+}
+.cs-link {
+  font-family:var(--M); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--red); text-decoration:none; cursor:none;
+  display:inline-flex; align-items:center; gap:12px; transition:gap .3s;
+}
+.cs-link:hover { gap:20px; }
+/* Dot nav */
+.cs-dots {
+  position:absolute; bottom:56px; right:56px;
+  display:flex; gap:8px;
+}
+.cs-dot {
+  width:24px; height:2px; background:var(--white-20);
+  cursor:none; transition:all .3s;
+}
+.cs-dot.on { width:40px; background:var(--red); }
+
+/* ─── SERVICES ACCORDION ─────────────────────────────────── */
+#services {
+  background:var(--off-black); padding:100px 56px;
+}
+.svc-header { margin-bottom:64px; }
+.svc-list { border-top:1px solid var(--white-08); }
+.svc-row {
+  border-bottom:1px solid var(--white-08);
+  overflow:hidden; cursor:none;
+}
+.svc-toggle {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:28px 0; transition:background .3s;
+}
+.svc-toggle:hover .svc-toggle-left { transform:translateX(8px); }
+.svc-toggle-left {
+  display:flex; align-items:center; gap:28px;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.svc-idx {
+  font-family:var(--D); font-size:48px; color:rgba(255,255,255,.06);
+  line-height:1; width:60px; flex-shrink:0;
+}
+.svc-name {
+  font-family:var(--D); font-size:clamp(24px,2.8vw,38px); letter-spacing:1px;
+  color:var(--white); transition:color .3s;
+}
+.svc-row:hover .svc-name, .svc-row.open .svc-name { color:var(--red); }
+.svc-plus {
+  font-size:24px; color:var(--white-60); font-weight:300;
+  width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  background:var(--white-04); border:1px solid var(--white-08);
+  transition:all .4s; flex-shrink:0;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.svc-row.open .svc-plus {
+  background:var(--red); border-color:var(--red); color:var(--white);
+  transform:rotate(45deg);
+}
+.svc-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .5s cubic-bezier(.16,1,.3,1);
+}
+.svc-row.open .svc-body { max-height:300px; }
+.svc-body-inner {
+  display:grid; grid-template-columns:1fr 2fr; gap:60px;
+  padding:0 0 40px 88px;
+}
+.svc-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.svc-tag {
+  font-family:var(--M); font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--red); border:1px solid rgba(232,0,26,.3); padding:6px 14px;
+}
+.svc-body-text {
+  font-family:var(--S); font-style:italic; font-size:clamp(15px,1.3vw,18px);
+  color:var(--white-60); line-height:1.8;
+}
+.svc-body-text a {
+  color:var(--white); text-decoration:none; border-bottom:1px solid var(--red);
+  transition:color .3s; cursor:none;
+}
+
+/* ─── BRAND LOGOS MARQUEE ────────────────────────────────── */
+#brands {
+  background:var(--black); padding:80px 0;
+  border-top:1px solid var(--white-04);
+  border-bottom:1px solid var(--white-04);
+}
+.brands-title { padding:0 56px 48px; }
+.logo-row { overflow:hidden; margin-bottom:16px; }
+.logo-row:last-child { margin-bottom:0; }
+.logo-track {
+  display:flex; width:max-content; gap:0;
+  animation:logoRoll 28s linear infinite;
+}
+.logo-track.rev { animation:logoRollRev 28s linear infinite; }
+@keyframes logoRoll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes logoRollRev { from{transform:translateX(-50%)} to{transform:translateX(0)} }
+.logo-chip {
+  font-family:var(--M); font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--white-20); padding:16px 40px; white-space:nowrap;
+  border-right:1px solid var(--white-04);
+  cursor:none; transition:all .3s; position:relative;
+}
+.logo-chip:hover { color:var(--white); background:var(--gray); }
+
+/* ─── INSTAGRAM / VISUAL DIARY ────────────────────────────── */
+#visual {
+  background:var(--off-black); padding:100px 56px;
+}
+.visual-header {
+  display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:48px;
+}
+.insta-cta {
+  font-family:var(--M); font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--white-60); text-decoration:none; cursor:none;
+  display:flex; align-items:center; gap:10px; transition:color .3s;
+}
+.insta-cta:hover { color:var(--red); }
+.vgrid {
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:auto;
+  gap:3px;
+}
+.vcell {
+  aspect-ratio:1; background:var(--gray); overflow:hidden;
+  position:relative; cursor:none;
+}
+.vcell:nth-child(1) { grid-column:1/3; grid-row:1/3; }
+.vcell:nth-child(8) { grid-column:5/7; grid-row:2/4; }
+.vcell-bg {
+  position:absolute; inset:0;
+  transition:transform .7s cubic-bezier(.16,1,.3,1);
+}
+.vcell:hover .vcell-bg { transform:scale(1.07); }
+.v1{background:linear-gradient(135deg,#1a0005,#0d0000)}
+.v2{background:linear-gradient(135deg,#000a14,#000)}
+.v3{background:linear-gradient(135deg,#0d0800,#000)}
+.v4{background:linear-gradient(135deg,#050010,#000)}
+.v5{background:linear-gradient(135deg,#001408,#000)}
+.v6{background:linear-gradient(135deg,#0d0500,#1a0005)}
+.v7{background:linear-gradient(135deg,#001020,#000)}
+.v8{background:linear-gradient(135deg,#1a0008,#000)}
+.vcell-label {
+  position:absolute; bottom:10px; left:10px;
+  font-family:var(--M); font-size:8px; letter-spacing:3px; text-transform:uppercase;
+  background:var(--red); color:var(--black); padding:3px 8px; font-weight:700;
+  z-index:2;
+}
+.vcell-over {
+  position:absolute; inset:0; background:rgba(0,0,0,0);
+  display:flex; align-items:center; justify-content:center;
+  transition:background .3s; z-index:1;
+}
+.vcell:hover .vcell-over { background:rgba(232,0,26,.12); }
+.vcell-plus {
+  font-family:var(--D); font-size:36px; color:var(--white);
+  opacity:0; transform:scale(.6); transition:all .3s;
+}
+.vcell:hover .vcell-plus { opacity:1; transform:scale(1); }
+
+/* ─── TESTIMONIALS ───────────────────────────────────────── */
+#testimonials {
+  background:var(--black); padding:100px 56px; overflow:hidden;
+}
+.testi-header { margin-bottom:60px; }
+.testi-track-wrap { overflow:hidden; }
+.testi-track {
+  display:flex; transition:transform .7s cubic-bezier(.16,1,.3,1);
+}
+.testi-card {
+  min-width:100%; padding:0 0 0 2px;
+}
+.testi-inner {
+  background:var(--gray); padding:56px;
+  border-left:3px solid var(--red); position:relative;
+}
+.testi-quote {
+  font-family:var(--S); font-size:clamp(20px,2.2vw,28px); font-style:italic;
+  color:var(--white); line-height:1.6; margin-bottom:40px;
+  max-width:800px;
+}
+.testi-quote::before {
+  content:'"'; font-family:var(--D); font-size:120px; color:var(--red);
+  opacity:.15; position:absolute; top:-20px; left:40px;
+  line-height:1; pointer-events:none;
+}
+.testi-author { display:flex; align-items:center; gap:20px; }
+.testi-avatar {
+  width:52px; height:52px; border-radius:50%; overflow:hidden;
+  background:var(--gray2); flex-shrink:0;
+  border:2px solid rgba(232,0,26,.4);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--D); font-size:20px; color:var(--red);
+}
+.testi-name {
+  font-family:var(--D); font-size:18px; letter-spacing:2px; color:var(--white);
+  display:block;
+}
+.testi-role {
+  font-family:var(--M); font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--white-60); display:block; margin-top:4px;
+}
+.testi-nav { display:flex; gap:12px; margin-top:32px; }
+.t-arr {
+  width:44px; height:44px; background:var(--gray2); border:1px solid var(--white-08);
+  display:flex; align-items:center; justify-content:center;
+  cursor:none; font-size:18px; color:var(--white-60); transition:all .3s;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.t-arr:hover { background:var(--red); border-color:var(--red); color:var(--white); }
+
+/* ─── AWARDS ─────────────────────────────────────────────── */
+#awards {
+  background:var(--off-black); padding:100px 56px;
+}
+.awards-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:60px;
+}
+.award-item {
+  background:var(--gray); padding:36px 32px; cursor:none;
+  position:relative; overflow:hidden;
+  border-bottom:2px solid transparent; transition:border-color .3s, background .3s;
+}
+.award-item:hover { border-color:var(--red); background:#161616; }
+.award-year {
+  font-family:var(--M); font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--red); margin-bottom:12px;
+}
+.award-name {
+  font-family:var(--D); font-size:20px; letter-spacing:1px;
+  color:var(--white); margin-bottom:8px; line-height:1.2;
+}
+.award-for {
+  font-family:var(--S); font-style:italic; font-size:13px;
+  color:var(--white-60);
+}
+
+/* ─── CONTACT / CTA ──────────────────────────────────────── */
+#contact {
+  background:var(--black); padding:140px 56px 80px;
+  position:relative; overflow:hidden;
+}
+.contact-bg-word {
+  position:absolute; bottom:-60px; right:-40px;
+  font-family:var(--D); font-size:32vw; color:rgba(255,255,255,.02);
+  pointer-events:none; line-height:1; user-select:none; white-space:nowrap;
+}
+.contact-inner { position:relative; z-index:1; max-width:860px; }
+.contact-h {
+  font-family:var(--D); font-size:clamp(64px,9vw,130px);
+  line-height:.88; letter-spacing:1px; color:var(--white); margin-bottom:64px;
+}
+.contact-h em { font-family:var(--S); font-style:italic; color:var(--red); font-weight:300; font-size:.8em; }
+.contact-cards {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-bottom:80px;
+}
+.contact-card {
+  background:var(--gray); padding:40px 32px;
+  text-decoration:none; cursor:none; display:block;
+  border-top:2px solid transparent; transition:all .3s;
+  position:relative; overflow:hidden;
+}
+.contact-card::after {
+  content:'↗';
+  position:absolute; top:20px; right:20px;
+  font-size:18px; color:var(--red); opacity:0;
+  transition:opacity .3s, transform .3s;
+  transform:translate(-4px,4px);
+}
+.contact-card:hover { border-color:var(--red); background:#161616; }
+.contact-card:hover::after { opacity:1; transform:translate(0,0); }
+.cc-icon { font-size:28px; display:block; margin-bottom:20px; }
+.cc-label {
+  font-family:var(--M); font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--red); display:block; margin-bottom:8px;
+}
+.cc-val {
+  font-family:var(--S); font-size:clamp(15px,1.4vw,18px);
+  color:var(--white); display:block;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+footer {
+  background:var(--off-black); padding:64px 56px 36px;
+  border-top:1px solid var(--white-08);
+}
+/* City tab switcher */
+.city-tabs { display:flex; gap:0; margin-bottom:60px; border-bottom:1px solid var(--white-08); }
+.city-tab {
+  font-family:var(--D); font-size:18px; letter-spacing:3px;
+  color:var(--white-20); padding:16px 32px; cursor:none;
+  border-bottom:2px solid transparent; transition:all .3s;
+  margin-bottom:-1px;
+}
+.city-tab.active { color:var(--white); border-color:var(--red); }
+.city-tab:hover { color:var(--white-60); }
+.city-panels {}
+.city-panel { display:none; }
+.city-panel.active { display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+.cp-name {
+  font-family:var(--D); font-size:24px; letter-spacing:2px; color:var(--white);
+  margin-bottom:8px;
+}
+.cp-addr {
+  font-family:var(--S); font-size:14px; color:var(--white-60); line-height:1.7;
+}
+.cp-contact a {
+  font-family:var(--M); font-size:10px; letter-spacing:2px;
+  color:var(--white-60); text-decoration:none; display:block; margin-bottom:6px;
+  transition:color .3s; cursor:none;
+}
+.cp-contact a:hover { color:var(--red); }
+
+.footer-bottom {
+  display:flex; justify-content:space-between; align-items:center;
+  padding-top:48px; margin-top:48px; border-top:1px solid var(--white-04);
+}
+.f-logo {
+  font-family:var(--D); font-size:28px; letter-spacing:4px;
+  color:var(--white); text-decoration:none;
+}
+.f-logo b { color:var(--red); font-weight:400; }
+.f-links { display:flex; gap:28px; }
+.f-links a {
+  font-family:var(--M); font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--white-20); text-decoration:none; transition:color .3s; cursor:none;
+}
+.f-links a:hover { color:var(--white); }
+.f-copy {
+  font-family:var(--M); font-size:9px; letter-spacing:1px;
+  color:rgba(255,255,255,.15);
+}
+.f-tagline {
+  font-family:var(--S); font-style:italic; font-size:12px;
+  color:rgba(255,255,255,.18); margin-top:8px;
+}
+
+/* ─── REVEAL UTILITY ─────────────────────────────────────── */
+.rev { opacity:0; transform:translateY(36px); transition:opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1); }
+.rev.in { opacity:1; transform:none; }
+.rev-l { opacity:0; transform:translateX(-36px); transition:opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1); }
+.rev-l.in { opacity:1; transform:none; }
+.rev-r { opacity:0; transform:translateX(36px); transition:opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1); }
+.rev-r.in { opacity:1; transform:none; }
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+.d4{transition-delay:.4s}.d5{transition-delay:.5s}.d6{transition-delay:.6s}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:1024px){
+  #what { grid-template-columns:1fr; gap:60px; }
+  .what-right { grid-template-columns:repeat(2,1fr); }
+  .cs-slide { grid-template-columns:1fr; }
+  .cs-img { display:none; }
+  .cs-info { padding:48px 40px; }
+  .awards-grid { grid-template-columns:1fr 1fr; }
+  .contact-cards { grid-template-columns:1fr; }
+  .vgrid { grid-template-columns:repeat(4,1fr); }
+  .vcell:nth-child(1) { grid-column:auto; grid-row:auto; }
+  .vcell:nth-child(8) { grid-column:auto; grid-row:auto; }
+  .city-panel.active { grid-template-columns:1fr; }
+  .footer-bottom { flex-direction:column; gap:20px; text-align:center; }
+  .f-links { flex-wrap:wrap; justify-content:center; }
+}
+@media(max-width:768px){
+  nav { padding:20px 24px; }
+  nav.stuck { padding:14px 24px; }
+  .n-links,.n-cta { display:none; }
+  .n-ham { display:flex; }
+  #hero,.hero-content,#what,#services,#brands,.brands-title,#visual,#testimonials,#awards,#contact,footer { padding-left:24px; padding-right:24px; }
+  .work-header { padding:60px 24px 32px; }
+  .cs-slider { height:auto; }
+  .cs-info { padding:40px 24px; }
+  .cs-dots { bottom:24px; right:24px; }
+  .what-right { grid-template-columns:1fr 1fr; }
+  .awards-grid { grid-template-columns:1fr; }
+  .svc-body-inner { grid-template-columns:1fr; gap:20px; padding:0 0 32px 20px; }
+  .vgrid { grid-template-columns:repeat(3,1fr); }
+  .city-tabs { flex-wrap:wrap; }
+  .hero-scroll-ind { right:24px; }
+  .hero-content { padding:0 24px 12vh; }
+  .hero-row { flex-direction:column; gap:28px; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-orbit">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="cp" d="M 50,50 m -30,0 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0"/>
+    </defs>
+    <text font-family="'DM Mono',monospace" font-size="9.5" fill="rgba(232,0,26,0.7)" letter-spacing="2">
+      <textPath href="#cp">FILLME NETWORKS · STORIES THAT STAY · </textPath>
+    </text>
+  </svg>
+</div>
+
+<!-- PROGRESS BAR -->
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="n-logo">FILL<b>ME*</b> NETWORKS</a>
+  <ul class="n-links">
+    <li><a href="#what">About</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#visual">Stories</a></li>
+    <li><a href="#brands">Brands</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="https://wa.me/919818180445?text=Hi%20Fillme%20Networks!" class="n-cta" target="_blank">Chat With Us</a>
+  <div class="n-ham" id="ham"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav" id="mobNav">
+  <a href="#what" class="mn-l">About</a>
+  <a href="#work" class="mn-l">Work</a>
+  <a href="#services" class="mn-l">Services</a>
+  <a href="#visual" class="mn-l">Stories</a>
+  <a href="#brands" class="mn-l">Brands</a>
+  <a href="#contact" class="mn-l">Contact</a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- HERO                                                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-video-wrap">
+    <div class="hero-grid-tex"></div>
+    <div class="hero-glow"></div>
+  </div>
+
+  <div class="hero-scroll-ind">
+    <div class="scroll-bar"></div>
+    <span class="scroll-label">scroll</span>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Creative Media · Production House · New Delhi</div>
+    <h1 class="hero-h1">
+      <span class="hl"><span>WE DON'T</span></span>
+      <span class="hl"><span>JUST CREATE</span></span>
+      <span class="hl"><span>stories.</span></span>
+      <span class="hl"><span>WE TELL THEM.</span></span>
+    </h1>
+    <div class="hero-row">
+      <p class="hero-sub">A full-service cinematic production house turning bold visions into films, documentaries, and campaigns that move people — and build legacies.</p>
+      <div class="hero-btns">
+        <a href="#work" class="btn-red">View Our Work</a>
+        <a href="https://wa.me/919818180445?text=Hi!" class="btn-ghost" target="_blank">Start a Project <span>→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- INLINE-IMAGE TICKER                                         -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="img-ticker">
+  <div class="img-ticker-track" id="imgTicker">
+    <div class="it-item">IT'S TIME TO CREATE A FILLME<div class="it-thumb"><div>FM</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> TELL YOUR STORY<div class="it-thumb"><div>TS</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> MAKE IT CINEMATIC<div class="it-thumb"><div>MC</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> EST. 2015 · NEW DELHI<div class="it-thumb"><div>ND</div></div></div>
+    <div class="it-item">IT'S TIME TO CREATE A FILLME<div class="it-thumb"><div>FM</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> TELL YOUR STORY<div class="it-thumb"><div>TS</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> MAKE IT CINEMATIC<div class="it-thumb"><div>MC</div></div></div>
+    <div class="it-item"><span class="it-sep">✦</span> EST. 2015 · NEW DELHI<div class="it-thumb"><div>ND</div></div></div>
+  </div>
+</div>
+
+<!-- SERVICES TICKER -->
+<div class="svc-ticker">
+  <div class="svc-ticker-track">
+    <div class="svc-item">Brand Films</div><div class="svc-item">Documentaries</div>
+    <div class="svc-item">Government Campaigns</div><div class="svc-item">Digital Series</div>
+    <div class="svc-item">Post Production</div><div class="svc-item">Aerial Cinematography</div>
+    <div class="svc-item">Motion Graphics</div><div class="svc-item">Social Content</div>
+    <div class="svc-item">Brand Films</div><div class="svc-item">Documentaries</div>
+    <div class="svc-item">Government Campaigns</div><div class="svc-item">Digital Series</div>
+    <div class="svc-item">Post Production</div><div class="svc-item">Aerial Cinematography</div>
+    <div class="svc-item">Motion Graphics</div><div class="svc-item">Social Content</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- WHAT WE DO                                                  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="what">
+  <div class="what-left">
+    <div class="wl-label rev">What defines us</div>
+    <h2 class="what-h rev d1">
+      We're storytellers<br>
+      <em>with a camera<br>and a conscience.</em>
+    </h2>
+    <p class="what-body rev d2">Fillme Networks is a full-service creative production house based in <strong>New Delhi, India.</strong> Since 2015, we've been crafting films, documentaries, and campaigns that don't just look beautiful — they make people <strong>feel something.</strong></p>
+    <p class="what-body rev d3" style="margin-top:-8px">We're on a mission to take the very best of <strong>Indian cinematic talent</strong> to the world. Driven by a ferocious hunger to create tangible impact for your brand.</p>
+    <a href="#about" class="what-link rev d4">Dive into our culture →</a>
+  </div>
+  <div class="what-right rev-r d1">
+    <div class="stat-box">
+      <span class="stat-num"><span class="cnt" data-t="500">0</span><span class="stat-suffix">+</span></span>
+      <span class="stat-label">Projects Delivered</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num"><span class="cnt" data-t="10">0</span><span class="stat-suffix">+</span></span>
+      <span class="stat-label">Years of Excellence</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num"><span class="cnt" data-t="80">0</span><span class="stat-suffix">+</span></span>
+      <span class="stat-label">Brand Partners</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num"><span class="cnt" data-t="200">0</span><span class="stat-suffix">+</span></span>
+      <span class="stat-label">Stories Told</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- CASE STUDIES NUMBERED SLIDER                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="work">
+  <div class="work-header">
+    <div>
+      <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>Selected Work</div>
+      <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(40px,5vw,72px);letter-spacing:1px;color:var(--white)">Stories We've <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Told</span></h2>
+    </div>
+    <div class="work-nav rev d2">
+      <div class="work-arr" id="csPrev">←</div>
+      <div class="work-counter"><b id="csIdx">01</b> / 06</div>
+      <div class="work-arr" id="csNext">→</div>
+    </div>
+  </div>
+
+  <div class="cs-slider">
+    <!-- Slide 1 -->
+    <div class="cs-slide active">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg1"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">01</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Government · Tourism</div>
+        <div class="cs-title">Incredible India Campaign</div>
+        <div class="cs-desc">A sweeping cinematic journey across India's landscapes, cultures, and spirit — produced for Ministry of Tourism. Shot across 12 states in 60 days.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+        <div class="cs-dots" id="csDots"></div>
+      </div>
+    </div>
+    <!-- Slide 2 -->
+    <div class="cs-slide">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg2"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">02</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Brand Film · Energy</div>
+        <div class="cs-title">Tata Power — Powering Lives</div>
+        <div class="cs-desc">An emotionally charged brand film connecting clean energy to everyday human stories. Reached 40M+ views across platforms.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+        <div class="cs-dots" id="csDots2"></div>
+      </div>
+    </div>
+    <!-- Slide 3 -->
+    <div class="cs-slide">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg3"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">03</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Documentary · Environment</div>
+        <div class="cs-title">Namami Gange</div>
+        <div class="cs-desc">The story of India's most sacred river and the national mission to restore it. Screened at three international documentary festivals.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+      </div>
+    </div>
+    <!-- Slide 4 -->
+    <div class="cs-slide">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg4"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">04</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Corporate · Automotive</div>
+        <div class="cs-title">Apollo Tyres — Precision Engineering</div>
+        <div class="cs-desc">A high-octane corporate film celebrating performance and precision. Shot at Apollo's state-of-the-art manufacturing facility.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+      </div>
+    </div>
+    <!-- Slide 5 -->
+    <div class="cs-slide">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg5"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">05</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Defense · Government</div>
+        <div class="cs-title">Indian Coast Guard Recruitment</div>
+        <div class="cs-desc">An inspiring recruitment film honoring the courage behind every mission. Featured across national broadcast channels and digital platforms.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+      </div>
+    </div>
+    <!-- Slide 6 -->
+    <div class="cs-slide">
+      <div class="cs-img">
+        <div class="cs-img-bg cs-bg6"></div>
+        <div class="cs-img-over"></div>
+        <div class="cs-num-big">06</div>
+      </div>
+      <div class="cs-info">
+        <div class="cs-cat">Podcast · Digital Content</div>
+        <div class="cs-title">Pocket FM — Original Series</div>
+        <div class="cs-desc">End-to-end production for Pocket FM's flagship original audio-visual series. 8 episodes, 2M+ streams in the first week.</div>
+        <a href="https://www.instagram.com/fillme_networks/" class="cs-link" target="_blank">View Case Study →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SERVICES ACCORDION                                          -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="services">
+  <div class="svc-header">
+    <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>What We Do</div>
+    <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(48px,5.5vw,88px);line-height:.92;letter-spacing:1px;color:var(--white)">Our <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Services</span></h2>
+  </div>
+  <div class="svc-list">
+    <div class="svc-row rev">
+      <div class="svc-toggle" onclick="toggleSvc(this)">
+        <div class="svc-toggle-left">
+          <span class="svc-idx">01</span>
+          <span class="svc-name">Brand Films</span>
+        </div>
+        <span class="svc-plus">+</span>
+      </div>
+      <div class="svc-body">
+        <div class="svc-body-inner">
+          <div class="svc-tags">
+            <span class="svc-tag">TVC</span><span class="svc-tag">Digital</span>
+            <span class="svc-tag">OTT</span><span class="svc-tag">Social</span>
+          </div>
+          <p class="svc-body-text">We produce end-to-end brand films — from concept to delivery — that connect your brand to the emotions of your audience. Every frame is intentional. Every story is personal. <a href="#contact">Let's build yours →</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="svc-row rev d1">
+      <div class="svc-toggle" onclick="toggleSvc(this)">
+        <div class="svc-toggle-left">
+          <span class="svc-idx">02</span>
+          <span class="svc-name">Documentaries</span>
+        </div>
+        <span class="svc-plus">+</span>
+      </div>
+      <div class="svc-body">
+        <div class="svc-body-inner">
+          <div class="svc-tags">
+            <span class="svc-tag">Feature</span><span class="svc-tag">Short</span>
+            <span class="svc-tag">Series</span><span class="svc-tag">Corporate</span>
+          </div>
+          <p class="svc-body-text">Powerful documentary storytelling that goes beyond the surface. We've worked on environmental, social, governmental, and corporate documentary projects that have screened nationally and internationally.</p>
+        </div>
+      </div>
+    </div>
+    <div class="svc-row rev d2">
+      <div class="svc-toggle" onclick="toggleSvc(this)">
+        <div class="svc-toggle-left">
+          <span class="svc-idx">03</span>
+          <span class="svc-name">Government Campaigns</span>
+        </div>
+        <span class="svc-plus">+</span>
+      </div>
+      <div class="svc-body">
+        <div class="svc-body-inner">
+          <div class="svc-tags">
+            <span class="svc-tag">Ministry</span><span class="svc-tag">DIPR</span>
+            <span class="svc-tag">PSU</span><span class="svc-tag">Defence</span>
+          </div>
+          <p class="svc-body-text">Trusted by multiple government ministries and PSUs to produce high-impact communication campaigns. From recruitment films to awareness drives — we speak the language of the nation.</p>
+        </div>
+      </div>
+    </div>
+    <div class="svc-row rev d3">
+      <div class="svc-toggle" onclick="toggleSvc(this)">
+        <div class="svc-toggle-left">
+          <span class="svc-idx">04</span>
+          <span class="svc-name">Digital & Social Content</span>
+        </div>
+        <span class="svc-plus">+</span>
+      </div>
+      <div class="svc-body">
+        <div class="svc-body-inner">
+          <div class="svc-tags">
+            <span class="svc-tag">Reels</span><span class="svc-tag">YouTube</span>
+            <span class="svc-tag">OTT</span><span class="svc-tag">Podcast</span>
+          </div>
+          <p class="svc-body-text">Rapid-format video content built for the scroll — but designed with cinematic care. We produce social-first content that stops thumbs and starts conversations.</p>
+        </div>
+      </div>
+    </div>
+    <div class="svc-row rev d4">
+      <div class="svc-toggle" onclick="toggleSvc(this)">
+        <div class="svc-toggle-left">
+          <span class="svc-idx">05</span>
+          <span class="svc-name">Post Production</span>
+        </div>
+        <span class="svc-plus">+</span>
+      </div>
+      <div class="svc-body">
+        <div class="svc-body-inner">
+          <div class="svc-tags">
+            <span class="svc-tag">VFX</span><span class="svc-tag">Color</span>
+            <span class="svc-tag">Sound</span><span class="svc-tag">Edit</span>
+          </div>
+          <p class="svc-body-text">Our in-house post facility handles everything from offline edit to final delivery — color grading, sound design, VFX, and motion graphics. The last mile, perfected.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- BRAND LOGOS                                                 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="brands">
+  <div class="brands-title">
+    <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>Trusted By</div>
+    <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(40px,5vw,72px);letter-spacing:1px;color:var(--white)">Brands That <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Believe</span></h2>
+  </div>
+  <div class="logo-row">
+    <div class="logo-track">
+      <div class="logo-chip">Apollo Tyres</div><div class="logo-chip">Tata Power</div>
+      <div class="logo-chip">Fab India</div><div class="logo-chip">Club Vistara</div>
+      <div class="logo-chip">Livguard Solar</div><div class="logo-chip">History TV18</div>
+      <div class="logo-chip">Network 18</div><div class="logo-chip">Mastercard</div>
+      <div class="logo-chip">H&M India</div><div class="logo-chip">Incredible India</div>
+      <div class="logo-chip">Liv Pure</div><div class="logo-chip">KEI Industries</div>
+      <div class="logo-chip">Apollo Tyres</div><div class="logo-chip">Tata Power</div>
+      <div class="logo-chip">Fab India</div><div class="logo-chip">Club Vistara</div>
+      <div class="logo-chip">Livguard Solar</div><div class="logo-chip">History TV18</div>
+      <div class="logo-chip">Network 18</div><div class="logo-chip">Mastercard</div>
+      <div class="logo-chip">H&M India</div><div class="logo-chip">Incredible India</div>
+      <div class="logo-chip">Liv Pure</div><div class="logo-chip">KEI Industries</div>
+    </div>
+  </div>
+  <div class="logo-row">
+    <div class="logo-track rev">
+      <div class="logo-chip">Carlsberg</div><div class="logo-chip">Pocket FM</div>
+      <div class="logo-chip">PNB Housing</div><div class="logo-chip">DIPR Govt</div>
+      <div class="logo-chip">Indian Coast Guard</div><div class="logo-chip">Ministry of Defence</div>
+      <div class="logo-chip">NDMA</div><div class="logo-chip">Namami Gange</div>
+      <div class="logo-chip">NCRTC</div><div class="logo-chip">Maccaferri</div>
+      <div class="logo-chip">Uttarakhand Tourism</div><div class="logo-chip">Posterscope</div>
+      <div class="logo-chip">Carlsberg</div><div class="logo-chip">Pocket FM</div>
+      <div class="logo-chip">PNB Housing</div><div class="logo-chip">DIPR Govt</div>
+      <div class="logo-chip">Indian Coast Guard</div><div class="logo-chip">Ministry of Defence</div>
+      <div class="logo-chip">NDMA</div><div class="logo-chip">Namami Gange</div>
+      <div class="logo-chip">NCRTC</div><div class="logo-chip">Maccaferri</div>
+      <div class="logo-chip">Uttarakhand Tourism</div><div class="logo-chip">Posterscope</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- VISUAL DIARY                                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="visual">
+  <div class="visual-header">
+    <div>
+      <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>@fillme_networks</div>
+      <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(40px,5vw,72px);letter-spacing:1px;color:var(--white)">Our <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Visual Diary</span></h2>
+    </div>
+    <a href="https://www.instagram.com/fillme_networks/" class="insta-cta rev d2" target="_blank">Follow on Instagram →</a>
+  </div>
+  <div class="vgrid rev d1">
+    <div class="vcell"><div class="vcell-bg v1"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">BTS</div></div>
+    <div class="vcell"><div class="vcell-bg v2"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">FILM</div></div>
+    <div class="vcell"><div class="vcell-bg v3"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">STORY</div></div>
+    <div class="vcell"><div class="vcell-bg v4"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">DOC</div></div>
+    <div class="vcell"><div class="vcell-bg v5"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">REEL</div></div>
+    <div class="vcell"><div class="vcell-bg v6"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">ART</div></div>
+    <div class="vcell"><div class="vcell-bg v7"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">EDIT</div></div>
+    <div class="vcell"><div class="vcell-bg v8"></div><div class="vcell-over"><div class="vcell-plus">+</div></div><div class="vcell-label">VFX</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TESTIMONIALS                                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="testi-header">
+    <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>Hear From Partners</div>
+    <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(40px,5vw,72px);letter-spacing:1px;color:var(--white)">What They <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Say</span></h2>
+  </div>
+  <div class="testi-track-wrap rev d1">
+    <div class="testi-track" id="testiTrack">
+      <div class="testi-card">
+        <div class="testi-inner">
+          <p class="testi-quote">Fillme Networks brought a rich visual language to our campaign — the kind that doesn't just communicate, it resonates. From the very first storyboard, we knew they were the right partners.</p>
+          <div class="testi-author">
+            <div class="testi-avatar">AT</div>
+            <div>
+              <span class="testi-name">APOLLO TYRES TEAM</span>
+              <span class="testi-role">Brand Marketing · Apollo Tyres India</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-inner">
+          <p class="testi-quote">Working with Fillme on the Namami Gange documentary was transformative. Their ability to capture the soul of India's most sacred river while weaving in the science of conservation was extraordinary.</p>
+          <div class="testi-author">
+            <div class="testi-avatar">NG</div>
+            <div>
+              <span class="testi-name">NAMAMI GANGE PROJECT</span>
+              <span class="testi-role">Ministry of Jal Shakti, Government of India</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-inner">
+          <p class="testi-quote">The Tata Power brand film exceeded every KPI we set. Fillme's approach of leading with human stories over product features was a masterstroke — and the results proved it. 40M+ views speaks for itself.</p>
+          <div class="testi-author">
+            <div class="testi-avatar">TP</div>
+            <div>
+              <span class="testi-name">TATA POWER MARKETING</span>
+              <span class="testi-role">Head of Brand, Tata Power Clean Energy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-inner">
+          <p class="testi-quote">Investing in building the brand through storytelling is key to our long-term agenda. Our partnership with Fillme Networks has been a great stepping stone — their craft is second to none in the country.</p>
+          <div class="testi-author">
+            <div class="testi-avatar">LG</div>
+            <div>
+              <span class="testi-name">LIVGUARD SOLAR</span>
+              <span class="testi-role">VP Marketing, Livguard Energy Technologies</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="testi-nav rev d2">
+    <div class="t-arr" id="tPrev">←</div>
+    <div class="t-arr" id="tNext">→</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- AWARDS                                                      -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="awards">
+  <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>Recognition</div>
+  <h2 class="rev d1" style="font-family:var(--D);font-size:clamp(40px,5vw,72px);letter-spacing:1px;color:var(--white);margin-bottom:0">Awards &amp; <span style="font-family:var(--S);font-style:italic;font-weight:300;color:var(--red)">Wins</span></h2>
+  <div class="awards-grid">
+    <div class="award-item rev d1"><div class="award-year">2024</div><div class="award-name">Best Government Documentary</div><div class="award-for">For Namami Gange — International Film Circuit</div></div>
+    <div class="award-item rev d2"><div class="award-year">2023</div><div class="award-name">Best Brand Film of the Year</div><div class="award-for">For Tata Power — Powering Lives Campaign</div></div>
+    <div class="award-item rev d3"><div class="award-year">2023</div><div class="award-name">Independent Production House of the Year</div><div class="award-for">Advertising Club, New Delhi</div></div>
+    <div class="award-item rev d1"><div class="award-year">2022</div><div class="award-name">Best Defense Communication Film</div><div class="award-for">For Indian Coast Guard — Ministry of Defence</div></div>
+    <div class="award-item rev d2"><div class="award-year">2022</div><div class="award-name">Excellence in Tourism Storytelling</div><div class="award-for">For Incredible India — Ministry of Tourism</div></div>
+    <div class="award-item rev d3"><div class="award-year">2021</div><div class="award-name">Best Social Impact Campaign</div><div class="award-for">For Livguard Solar — Clean Energy Initiative</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- CONTACT                                                     -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="contact">
+  <div class="contact-bg-word">FM</div>
+  <div class="contact-inner">
+    <div class="rev" style="font-family:var(--M);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:20px;display:flex;align-items:center;gap:12px;"><span style="width:28px;height:1px;background:var(--red);display:block"></span>Ready When You Are</div>
+    <h2 class="contact-h rev d1">Your Next<br>Great <em>Film</em><br>Starts Here.</h2>
+    <div class="contact-cards">
+      <a href="https://wa.me/919818180445?text=Hi%20Fillme%20Networks!" class="contact-card rev d1" target="_blank">
+        <span class="cc-icon">💬</span>
+        <span class="cc-label">WhatsApp</span>
+        <span class="cc-val">Chat on WhatsApp</span>
+      </a>
+      <a href="mailto:hello@fillmenetworks.com" class="contact-card rev d2">
+        <span class="cc-icon">✉️</span>
+        <span class="cc-label">Email</span>
+        <span class="cc-val">hello@fillmenetworks.com</span>
+      </a>
+      <a href="tel:+919818180445" class="contact-card rev d3">
+        <span class="cc-icon">📞</span>
+        <span class="cc-label">Phone</span>
+        <span class="cc-val">+91 98181 80445</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FOOTER WITH CITY TABS                                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="city-tabs" id="cityTabs">
+    <div class="city-tab active" data-city="delhi">NEW DELHI</div>
+    <div class="city-tab" data-city="mumbai">MUMBAI</div>
+    <div class="city-tab" data-city="bangalore">BANGALORE</div>
+  </div>
+  <div class="city-panels" id="cityPanels">
+    <div class="city-panel active" id="cp-delhi">
+      <div>
+        <div class="cp-name">New Delhi — HQ</div>
+        <div class="cp-addr">1-A, Khasra No. 275, First Floor<br>Westend Marg, Saket<br>New Delhi, Delhi 110030</div>
+      </div>
+      <div class="cp-contact">
+        <a href="tel:+919818180445">+91 98181 80445</a>
+        <a href="mailto:hello@fillmenetworks.com">hello@fillmenetworks.com</a>
+      </div>
+    </div>
+    <div class="city-panel" id="cp-mumbai">
+      <div>
+        <div class="cp-name">Mumbai</div>
+        <div class="cp-addr">Lower Parel, Mumbai<br>Maharashtra 400013</div>
+      </div>
+      <div class="cp-contact">
+        <a href="mailto:mumbai@fillmenetworks.com">mumbai@fillmenetworks.com</a>
+      </div>
+    </div>
+    <div class="city-panel" id="cp-bangalore">
+      <div>
+        <div class="cp-name">Bangalore</div>
+        <div class="cp-addr">Koramangala, Bengaluru<br>Karnataka 560034</div>
+      </div>
+      <div class="cp-contact">
+        <a href="mailto:bangalore@fillmenetworks.com">bangalore@fillmenetworks.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div>
+      <a href="#hero" class="f-logo">FILL<b>ME*</b> NETWORKS</a>
+      <div class="f-tagline">Every frame is a story waiting to be told.</div>
+    </div>
+    <div class="f-links">
+      <a href="#what">About</a>
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#brands">Brands</a>
+      <a href="#contact">Contact</a>
+      <a href="#">Privacy</a>
+    </div>
+    <div>
+      <div class="f-copy">© 2025 Fillme Networks Private Limited. All Rights Reserved.</div>
+      <div class="f-copy" style="margin-top:4px;font-style:italic;font-family:var(--S);color:rgba(255,255,255,.12)">"All Right Reserved, All Wrong Reversed." · Made with ♥ in New Delhi</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT                                                  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<script>
+// ── CURSOR ──
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-orbit');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  dot.style.left=mx+'px'; dot.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,.svc-toggle,.work-arr,.t-arr,.city-tab,.stat-box,.vcell,.cs-slide,.award-item,.contact-card,.logo-chip').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ dot.classList.add('big'); ring.classList.add('big'); });
+  el.addEventListener('mouseleave',()=>{ dot.classList.remove('big'); ring.classList.remove('big'); });
+});
+
+// ── PROGRESS ──
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY, h=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('prog').style.width=(s/h*100)+'%';
+});
+
+// ── NAV ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('stuck',window.scrollY>60);
+});
+
+// ── HAMBURGER ──
+const ham=document.getElementById('ham'), mob=document.getElementById('mobNav');
+ham.addEventListener('click',()=>{
+  ham.classList.toggle('open'); mob.classList.toggle('open');
+});
+document.querySelectorAll('.mn-l').forEach(l=>l.addEventListener('click',()=>{
+  ham.classList.remove('open'); mob.classList.remove('open');
+}));
+
+// ── SCROLL REVEAL ──
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting) e.target.classList.add('in');
+}),{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rev,.rev-l,.rev-r').forEach(el=>ro.observe(el));
+
+// ── COUNT UP ──
+const co=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(!e.isIntersecting) return;
+  const el=e.target, target=+el.dataset.t, dur=1800, start=performance.now();
+  (function tick(now){
+    const p=Math.min((now-start)/dur,1), ease=1-Math.pow(1-p,3);
+    el.textContent=Math.floor(ease*target);
+    if(p<1) requestAnimationFrame(tick); else el.textContent=target;
+  })(start);
+  co.unobserve(el);
+}),{threshold:.6});
+document.querySelectorAll('.cnt').forEach(el=>co.observe(el));
+
+// ── CASE STUDY SLIDER ──
+const slides=document.querySelectorAll('.cs-slide');
+let csIdx=0;
+function buildDots(){
+  // add dots to first slide info (and keep synced)
+  slides.forEach((s,i)=>{
+    const dc=s.querySelector('.cs-info');
+    if(!dc.querySelector('.cs-dots')){
+      const d=document.createElement('div'); d.className='cs-dots'; dc.appendChild(d);
+    }
+    dc.querySelector('.cs-dots').innerHTML='';
+    slides.forEach((_,j)=>{
+      const dd=document.createElement('div');
+      dd.className='cs-dot'+(j===i?'':j===csIdx?' on':'');
+      dc.querySelector('.cs-dots').appendChild(dd);
+    });
+  });
+  // sync all dots to current
+  document.querySelectorAll('.cs-dots').forEach(dc=>{
+    dc.querySelectorAll('.cs-dot').forEach((d,i)=>{
+      d.classList.toggle('on', i===csIdx);
+    });
+  });
+}
+function goCS(dir){
+  slides[csIdx].classList.remove('active');
+  csIdx=(csIdx+dir+slides.length)%slides.length;
+  slides[csIdx].classList.add('active');
+  document.getElementById('csIdx').textContent=String(csIdx+1).padStart(2,'0');
+  buildDots();
+}
+document.getElementById('csPrev').addEventListener('click',()=>goCS(-1));
+document.getElementById('csNext').addEventListener('click',()=>goCS(1));
+// keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') goCS(1);
+  if(e.key==='ArrowLeft') goCS(-1);
+});
+buildDots();
+
+// ── SERVICES ACCORDION ──
+function toggleSvc(toggle){
+  const row=toggle.closest('.svc-row');
+  const wasOpen=row.classList.contains('open');
+  document.querySelectorAll('.svc-row.open').forEach(r=>r.classList.remove('open'));
+  if(!wasOpen) row.classList.add('open');
+}
+
+// ── TESTIMONIALS ──
+const tt=document.getElementById('testiTrack');
+const tCards=tt.querySelectorAll('.testi-card');
+let ti=0;
+function goT(dir){
+  ti=(ti+dir+tCards.length)%tCards.length;
+  tt.style.transform=`translateX(-${ti*100}%)`;
+}
+document.getElementById('tPrev').addEventListener('click',()=>goT(-1));
+document.getElementById('tNext').addEventListener('click',()=>goT(1));
+// auto-advance
+setInterval(()=>goT(1), 6000);
+
+// ── CITY TABS ──
+document.querySelectorAll('.city-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.city-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.city-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('cp-'+tab.dataset.city).classList.add('active');
+  });
+});
+
+// ── HERO PARALLAX ──
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const g=document.querySelector('.hero-glow');
+  if(g) g.style.transform=`translateY(${y*.2}px)`;
+});
+</script>
+</body>
+</html>
